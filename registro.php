@@ -1,78 +1,49 @@
-<?php
-/**
- * PROCESAMIENTO DE RESERVAS
- * Este archivo recibe los datos del formulario de reserva, 
- * los valida, los guarda en la base de datos y envía notificaciones a n8n.
- */
-include 'conexion.php';
 
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
+<!DOCTYPE html>
+<html lang="es">
 
-    // Validar que los campos no vengan vacíos
-    $nombre = $_POST['nombre'];
-    $email_cliente = $_POST['email'];
-    $servicio = $_POST['servicio'];
-    $fecha = $_POST['fecha'];
-    $hora = $_POST['hora'];
-    $telefono = isset($_POST['telefono']) ? $_POST['telefono'] : '';
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Cuenta | glow belleza</title>
+    <link rel="stylesheet" href="style.css?v=<?php echo time(); ?>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,400&family=Montserrat:wght@200;400;500&display=swap"
+        rel="stylesheet">
+</head>
 
-    // Comprobar si el usuario ha iniciado sesión para el ID del cliente (mejora opcional)
-    session_start();
-    $cliente_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 0;
+<body>
+    <div class="cursor-dot" id="cursor-dot"></div>
+    <div class="cursor-outline" id="cursor-outline"></div>
 
-    // Verificar disponibilidad antes de insertar (Doble comprobación en el backend)
-    $check_sql = "SELECT id FROM reservas WHERE fecha = ? AND hora = ?";
-    $stmt_check = $conexion->prepare($check_sql);
-    $stmt_check->bind_param("ss", $fecha, $hora);
-    $stmt_check->execute();
-    $stmt_check->store_result();
+    <a href="index.php" class="back-link">← Volver al Inicio</a>
 
-    if ($stmt_check->num_rows > 0) {
-        echo "<script>
-            alert('Lo sentimos, esa hora ya está reservada. Por favor elige otra.');
-            window.location.href = 'index.php#booking';
-          </script>";
-        $stmt_check->close();
-        exit();
-    }
-    $stmt_check->close();
+    <section class="login-section">
+        <div class="login-container">
+            <div class="form-box register">
+                <h2>Crear Cuenta</h2>
+                <form action="auth_register.php" method="POST">
+                    <div class="input-box">
+                        <input type="text" name="nombre" required placeholder="Nombre Completo">
+                    </div>
+                    <div class="input-box">
+                        <input type="email" name="email" required placeholder="Correo Electrónico">
+                    </div>
+                    <div class="input-box">
+                        <input type="password" name="password" required placeholder="Contraseña">
+                    </div>
+                    <button type="submit" class="cta-button">Registrarse</button>
+                    <div class="switch-link">
+                        <p>¿Ya tienes cuenta? <a href="login.php">Inicia Sesión</a></p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
 
-    // 4. INSERTAR EN LA TABLA DE RESERVAS
-    $sql = "INSERT INTO reservas (cliente_id, nombre_cliente, telefono, servicio, fecha, hora) VALUES (?, ?, ?, ?, ?, ?)";
-    $stmt = $conexion->prepare($sql);
+    <script src="script.js"></script>
+</body>
 
-    if ($stmt) {
-        $stmt->bind_param("isssss", $cliente_id, $nombre, $telefono, $servicio, $fecha, $hora);
-
-        if ($stmt->execute()) {
-            $reserva_id = $stmt->insert_id;
-
-            // 5. INTEGRACIÓN N8N - Enviar notificación de nueva reserva
-            // Se invoca un webhook para automatizar el envío de emails o mensajes.
-            include_once 'n8n_send_data.php';
-            $resultado_n8n = enviarAn8n('nueva_reserva', [
-                'reserva_id' => $reserva_id,
-                'nombre' => $nombre,
-                'email' => $email_cliente,
-                'telefono' => $telefono,
-                'servicio' => $servicio,
-                'fecha' => $fecha,
-                'hora' => $hora,
-                'codigo_confirmacion' => 'RES-' . str_pad($reserva_id, 6, '0', STR_PAD_LEFT),
-                'timestamp' => date('Y-m-d H:i:s')
-            ]);
-
-            header("Location: index.php?success=1");
-            exit();
-
-        } else {
-            echo " Error al ejecutar la consulta: " . $stmt->error;
-        }
-        $stmt->close();
-    } else {
-        echo " Error en la preparación de la consulta: " . $conexion->error;
-    }
-
-    $conexion->close();
-}
-?>
+</html>
