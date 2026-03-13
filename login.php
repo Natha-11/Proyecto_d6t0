@@ -18,17 +18,11 @@
     <div class="cursor-dot" id="cursor-dot"></div>
     <div class="cursor-outline" id="cursor-outline"></div>
 
-    <header id="navbar">
-        <nav>
-            <ul class="nav-links">
-                <li><a href="index.php">Volver al Inicio</a></li>
-            </ul>
-        </nav>
-    </header>
+    <a href="index.php" class="back-link">← Volver al Inicio</a>
 
     <section class="login-section">
         <div class="login-container">
-            <div class="form-box login" style="display: none;">
+            <div class="form-box login">
                 <h2>Iniciar Sesión</h2>
                 <form action="auth_login.php" method="POST">
                     <div class="input-box">
@@ -39,26 +33,7 @@
                     </div>
                     <button type="submit" class="cta-button">Entrar</button>
                     <div class="switch-link">
-                        <p>¿No tienes cuenta? <a href="#" id="show-register">Regístrate</a></p>
-                    </div>
-                </form>
-            </div>
-
-            <div class="form-box register">
-                <h2>Crear Cuenta</h2>
-                <form action="auth_register.php" method="POST">
-                    <div class="input-box">
-                        <input type="text" name="nombre" required placeholder="Nombre Completo">
-                    </div>
-                    <div class="input-box">
-                        <input type="email" name="email" required placeholder="Correo Electrónico">
-                    </div>
-                    <div class="input-box">
-                        <input type="password" name="password" required placeholder="Contraseña">
-                    </div>
-                    <button type="submit" class="cta-button">Registrarse</button>
-                    <div class="switch-link">
-                        <p>¿Ya tienes cuenta? <a href="#" id="show-login">Inicia Sesión</a></p>
+                        <p>¿No tienes cuenta? <a href="registro.php">Regístrate</a></p>
                     </div>
                 </form>
             </div>
@@ -66,36 +41,6 @@
     </section>
 
     <script src="script.js"></script>
-    <script>
-        const loginForm = document.querySelector('.form-box.login');
-        const registerForm = document.querySelector('.form-box.register');
-        const showRegister = document.getElementById('show-register');
-        const showLogin = document.getElementById('show-login');
-
-        // Comprobar la URL para el modo
-        const urlParams = new URLSearchParams(window.location.search);
-        const mode = urlParams.get('mode');
-
-        if (mode === 'register') {
-            loginForm.style.display = 'none';
-            registerForm.style.display = 'block';
-        } else {
-            loginForm.style.display = 'block';
-            registerForm.style.display = 'none';
-        }
-
-        showRegister.addEventListener('click', (e) => {
-            e.preventDefault();
-            loginForm.style.display = 'none';
-            registerForm.style.display = 'block';
-        });
-
-        showLogin.addEventListener('click', (e) => {
-            e.preventDefault();
-            registerForm.style.display = 'none';
-            loginForm.style.display = 'block';
-        });
-    </script>
 </body>
 
 </html>

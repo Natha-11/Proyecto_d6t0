@@ -35,16 +35,39 @@ try {
 
     // Insertar ítems
     $stmt_item = $conexion->prepare("INSERT INTO factura_items (factura_id, producto, precio) VALUES (?, ?, ?)");
+    $stmt_res = $conexion->prepare("INSERT INTO reservas (cliente_id, nombre_cliente, telefono, servicio, fecha, hora) VALUES (?, ?, ?, ?, ?, ?)");
+    
     foreach ($cart as $item) {
         $stmt_item->bind_param("isd", $factura_id, $item['name'], $item['price']);
         $stmt_item->execute();
+        
+        // Si es una reserva, insertarla también en la tabla de reservas
+        if (isset($item['metadata']) && $item['metadata']['type'] === 'reservation') {
+            $m = $item['metadata'];
+            $stmt_res->bind_param("isssss", $cliente_id, $m['nombre'], $m['telefono'], $m['servicio'], $m['fecha'], $m['hora']);
+            $stmt_res->execute();
+            
+            // Notificar a n8n
+            include_once 'n8n_send_data.php';
+            enviarAn8n('nueva_reserva', [
+                'factura_nro' => $nro_factura,
+                'nombre' => $m['nombre'],
+                'email' => $m['email'],
+                'telefono' => $m['telefono'],
+                'servicio' => $m['servicio'],
+                'fecha' => $m['fecha'],
+                'hora' => $m['hora']
+            ]);
+        }
     }
     $stmt_item->close();
+    $stmt_res->close();
 
     $conexion->commit();
 
     echo json_encode([
         'success' => true,
+        'invoice_id' => $factura_id,
         'invoice' => [
             'nro' => $nro_factura,
             'fecha' => date('d/m/Y H:i'),

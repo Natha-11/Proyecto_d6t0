@@ -8,7 +8,7 @@ session_start();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>glow belleza | Makeup Artistry</title>
-    <link rel="stylesheet" href="style.css?v=2.0">
+    <link rel="stylesheet" href="style.css?v=3.1">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -24,7 +24,7 @@ session_start();
 
     <header id="navbar">
         <div class="logo-container">
-            <a href="#hero" class="logo-link">
+            <a href="#" class="logo-link">
                 <img src="logo_estudio.jpg" alt="Logo Luxury Glow" class="logo-img-circular">
                 <span class="logo-text">LUXURY GLOW</span>
             </a>
@@ -37,18 +37,11 @@ session_start();
                 <li><a href="#contact">Contacto</a></li>
                 <?php if (isset($_SESSION['user_id'])): ?>
                     <li><a href="#booking" class="nav-cta">Citas</a></li>
+                    <li><a href="logout.php" style="color: #ff8888;">Salir</a></li>
                 <?php else: ?>
-                    <li><a href="login.php">Login</a></li>
+                    <li><a href="login.php" class="nav-cta">Login</a></li>
+                    <li><a href="registro.php" class="nav-cta" style="background: transparent; color: var(--primary-color); border: 1px solid var(--primary-color);">Registro</a></li>
                 <?php endif; ?>
-                <li>
-                    <button id="cart-btn" class="cart-trigger">
-                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4H6zM3 6h18M16 10a4 4 0 01-8 0"></path>
-                        </svg>
-                        <span id="cart-count">0</span>
-                    </button>
-                </li>
             </ul>
         </nav>
         <div class="menu-toggle" id="mobile-menu">
@@ -66,28 +59,40 @@ session_start();
         <div class="hero-visual fade-in delay-1"></div>
     </section>
 
-    <h2 class="section-title reveal">La Colección</h2>
-    <div class="product-grid">
-        <div class="product-card reveal">
-            <img src="imagen1.jpg" alt="Natural" class="product-img">
-            <h3>NATURAL</h3>
-            <p class="price">EDICIÓN 01 — $500</p>
-            <button class="add-cart">Añadir al set</button>
+    <section id="collection" class="section-padding" style="padding-top:0;">
+        <h2 class="section-title reveal">La Colección</h2>
+        <div class="product-grid">
+            <div class="product-card reveal">
+                <img src="imagen1.jpg" alt="Natural" class="product-img">
+                <h3>NATURAL</h3>
+                <p class="price">EDICIÓN 01 — $500</p>
+                <?php if (isset($_SESSION['user_id'])): ?>
+                    <button class="cta-button reserve-btn" data-service="natural" style="display:inline-block; margin-top:20px; padding: 10px 25px; width: 100%;">Reservar</button>
+                <?php else: ?>
+                    <a href="login.php" class="cta-button" style="display:inline-block; margin-top:20px; padding: 10px 25px; width: 100%; text-align:center;">Reservar</a>
+                <?php endif; ?>
+            </div>
+            <div class="product-card reveal">
+                <img src="imagen2.jpg" alt="Soft Glam" class="product-img">
+                <h3>SOFT GLAM</h3>
+                <p class="price">EDICIÓN 02 — $600</p>
+                <?php if (isset($_SESSION['user_id'])): ?>
+                    <button class="cta-button reserve-btn" data-service="soft-glam" style="display:inline-block; margin-top:20px; padding: 10px 25px; width: 100%;">Reservar</button>
+                <?php else: ?>
+                    <a href="login.php" class="cta-button" style="display:inline-block; margin-top:20px; padding: 10px 25px; width: 100%; text-align:center;">Reservar</a>
+                <?php endif; ?>
+            </div>
+            <div class="product-card reveal">
+                <img src="imagen3.jpg" alt="Smokey Eyes" class="product-img">
+                <h3>SMOKEY</h3>
+                <p class="price">EDICIÓN 03 — $1200</p>
+                <?php if (isset($_SESSION['user_id'])): ?>
+                    <button class="cta-button reserve-btn" data-service="smokey-eyes" style="display:inline-block; margin-top:20px; padding: 10px 25px; width: 100%;">Reservar</button>
+                <?php else: ?>
+                    <a href="login.php" class="cta-button" style="display:inline-block; margin-top:20px; padding: 10px 25px; width: 100%; text-align:center;">Reservar</a>
+                <?php endif; ?>
+            </div>
         </div>
-        <div class="product-card reveal">
-            <img src="imagen2.jpg" alt="Soft Glam" class="product-img">
-            <h3>SOFT GLAM</h3>
-            <p class="price">EDICIÓN 02 — $600</p>
-            <button class="add-cart">Añadir al set</button>
-        </div>
-        <div class="product-card reveal">
-            <img src="imagen3.jpg" alt="Smokey Eyes" class="product-img">
-            <h3>SMOKEY</h3>
-            <p class="price">EDICIÓN 03 — $1200</p>
-            <button class="add-cart">Añadir al set</button>
-        </div>
-    </div>
-    </div>
     </section>
 
     <section id="about" class="section-padding philosophy-section">
@@ -114,10 +119,11 @@ session_start();
     </section>
 
     <?php if (isset($_SESSION['user_id'])): ?>
-        <section id="booking" class="section-padding booking-section">
-            <div class="container">
-                <h2 class="section-title">Reserva tu Cita</h2>
-                <form class="booking-form" action="registro.php" method="POST" id="bookingForm">
+        <div id="booking-modal-overlay" class="modal-overlay">
+            <div class="modal-container">
+                <span class="close-modal" id="close-booking-modal">&times;</span>
+                <h2 class="section-title" style="text-align: center; font-size: 2.2rem; margin-bottom: 2rem;">Confirma tu Fecha y Hora</h2>
+                <form class="booking-form" action="registro.php" method="POST" id="bookingForm" style="box-shadow: none; background: transparent; padding: 0; border: none;">
                     <input type="hidden" name="hora" id="selectedHora" required>
 
                     <div class="form-group triple">
@@ -128,14 +134,16 @@ session_start();
                         <input type="tel" name="telefono" placeholder="WhatsApp (Ej: +123...)" required>
                     </div>
 
-                    <div class="form-group">
-                        <select name="servicio" required>
+                    <div class="form-group" style="display: none;">
+                        <select name="servicio" id="servicio-select" required>
                             <option value="" disabled selected>Selecciona Servicio</option>
-                            <option value="natural">Natural - $500</option>
-                            <option value="soft-glam">Soft Glam - $600</option>
-                            <option value="smokey-eyes">Smokey Eyes - $1200</option>
+                            <option value="natural">Natural</option>
+                            <option value="soft-glam">Soft Glam</option>
+                            <option value="smokey-eyes">Smokey Eyes</option>
                         </select>
                     </div>
+
+                    <p style="color: var(--primary-color); text-align: center; font-style: italic; margin-bottom: 1rem; font-size: 1.2rem;" id="selected-service-display">Servicio Seleccionado</p>
 
                     <!-- Wrapper oculto para el input de fecha (para enviar con el form) -->
                     <input type="hidden" name="fecha" id="bookingDateInput" required>
@@ -190,57 +198,37 @@ session_start();
                     </div>
 
                     <div style="text-align: center; margin-top: 3rem;">
-                        <button type="submit" class="cta-button" style="width: 100%; max-width: 400px;">Confirmar
-                            Reserva</button>
+                        <button type="submit" class="cta-button" style="width: 100%; max-width: 400px;">Reservar</button>
                     </div>
                 </form>
             </div>
-        </section>
+        </div>
     <?php endif; ?>
 
-    <!-- Cajón del Carrito -->
-    <div id="cart-drawer" class="cart-drawer">
-        <div class="cart-header">
-            <h3>Tu Carrito</h3>
-            <button id="close-cart">&times;</button>
-        </div>
-        <div id="cart-items" class="cart-items">
-            <!-- Los artículos se añaden aquí -->
-        </div>
-        <div class="cart-footer">
-            <div class="cart-total">
-                <span>Total:</span>
-                <span id="total-price">$0</span>
-            </div>
-            <button class="checkout-btn">Finalizar Compra</button>
-        </div>
-    </div>
-    <div id="cart-overlay" class="cart-overlay"></div>
 
-    <footer class="footer section-padding">
+
+    <footer id="contact" class="footer section-padding">
         <div class="container">
-            <div class="footer-grid"
-                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; border-top: 1px solid #222; padding-top: 40px;">
+            <div class="footer-grid">
                 <div class="footer-brand">
-                    <h3 style="color: #fff; margin-bottom: 15px;">GLOW BELLEZA</h3>
-                    <p style="color: #888; font-size: 0.9rem;">Resaltando tu belleza natural con exclusividad y
-                        elegancia en cada detalle.</p>
+                    <h3>GLOW BELLEZA</h3>
+                    <p>Resaltando tu belleza natural con exclusividad y elegancia en cada detalle.</p>
                 </div>
                 <div class="footer-links">
-                    <h4 style="color: #fff; margin-bottom: 15px;">Enlaces</h4>
-                    <ul style="list-style: none; padding: 0; line-height: 2;">
-                        <li><a href="#" style="color: #888; text-decoration: none;">Inicio</a></li>
-                        <li><a href="#booking" style="color: #888; text-decoration: none;">Reservas</a></li>
-                        <li><a href="#contact" style="color: #888; text-decoration: none;">Contacto</a></li>
+                    <h4>Enlaces</h4>
+                    <ul>
+                        <li><a href="#">Inicio</a></li>
+                        <li><a href="#booking">Reservas</a></li>
+                        <li><a href="#contact">Contacto</a></li>
                     </ul>
                 </div>
                 <div class="footer-contact">
-                    <h4 style="color: #fff; margin-bottom: 15px;">Contacto</h4>
-                    <p style="color: #888; font-size: 0.9rem;">WhatsApp: +123 456 789</p>
-                    <p style="color: #888; font-size: 0.9rem;">Email: info@glowbelleza.com</p>
+                    <h4>Contacto</h4>
+                    <p>WhatsApp: +123 456 789</p>
+                    <p>Email: info@glowbelleza.com</p>
                 </div>
             </div>
-            <div class="footer-bottom" style="text-align: center; margin-top: 50px; color: #555; font-size: 0.8rem;">
+            <div class="footer-bottom">
                 <p>&copy; <?php echo date('Y'); ?> Glow Belleza. Todos los derechos reservados.</p>
             </div>
         </div>
@@ -267,6 +255,7 @@ session_start();
             const selectedHoraInput = document.getElementById('selectedHora');
             const appointmentList = document.getElementById('appointmentList');
             const viewMoreContainer = document.getElementById('viewMoreContainer');
+            const bookingForm = document.getElementById('bookingForm');
             const viewMoreBtn = document.getElementById('viewMoreBtn');
             let showAllAppointments = false;
 
@@ -478,162 +467,125 @@ session_start();
                 renderCalendar(currentMonth, currentYear);
             });
 
-            // Enviar Reserva
+            // Enviar Reserva Directamente
             if (bookingForm) {
                 bookingForm.addEventListener('submit', async (e) => {
                     e.preventDefault();
-                    if (!bookingDateInput.value || !selectedHoraInput.value) {
-                        alert('Por favor selecciona una fecha y una hora.');
+                    const formData = new FormData(bookingForm);
+                    if (!bookingDateInput.value || !selectedHoraInput.value || !formData.get('servicio')) {
+                        alert('Por favor selecciona servicio, fecha y hora.');
                         return;
                     }
 
-                    const formData = new FormData(bookingForm);
+                    const serviceMap = {
+                        'natural': { name: 'Maquillaje Natural', price: 500 },
+                        'soft-glam': { name: 'Soft Glam', price: 600 },
+                        'smokey-eyes': { name: 'Smokey Eyes', price: 1200 }
+                    };
+                    const selectedService = formData.get('servicio');
+                    const appointmentData = serviceMap[selectedService] || { name: 'Servicio', price: 0 };
+                    
+                    const resName = `Reserva: ${appointmentData.name}`;
+                    const metadata = {
+                        type: 'reservation',
+                        nombre: formData.get('nombre'),
+                        email: formData.get('email'),
+                        telefono: formData.get('telefono'),
+                        servicio: selectedService,
+                        fecha: formData.get('fecha'),
+                        hora: formData.get('hora')
+                    };
+                    
+                    const singleCartItem = { name: resName, price: appointmentData.price, metadata: metadata };
+                    
+                    // Enviar directamente
+                    const submitBtn = bookingForm.querySelector('button[type="submit"]');
+                    const originalText = submitBtn.textContent;
+                    submitBtn.textContent = 'Procesando...';
+                    submitBtn.disabled = true;
+
                     try {
-                        const response = await fetch('n8n_send_data.php', {
+                        const response = await fetch('api_create_invoice.php', {
                             method: 'POST',
-                            body: formData
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ cart: [singleCartItem], total: appointmentData.price })
                         });
                         const result = await response.json();
 
                         if (result.success) {
                             const successModal = document.getElementById('success-modal');
                             if (successModal) successModal.style.display = 'flex';
-                            fetchReservations(); // Refrescar lista
+
+                            setTimeout(() => {
+                                window.location.href = `invoice.php?id=${result.invoice_id}`;
+                            }, 800);
+                            
+                            // Limpiar y cerrar modal
+                            bookingForm.reset();
+                            bookingDateInput.value = '';
+                            selectedHoraInput.value = '';
+                            document.querySelectorAll('.time-slot.selected').forEach(el => el.classList.remove('selected'));
+                            document.querySelectorAll('.calendar-day.selected').forEach(d => d.classList.remove('selected'));
+                            selectedDateDisplay.textContent = '';
+                            hoursGrid.style.display = 'none';
+                            document.getElementById('booking-modal-overlay').classList.remove('open');
+
+                            // Actualizar la lista de citas
+                            fetchReservations();
                         } else {
-                            alert('Error: ' + result.message);
+                            alert('Error al procesar la reserva: ' + result.message);
                         }
                     } catch (err) {
-                        console.error('Error enviando reserva:', err);
+                        console.error('Error en la reserva:', err);
+                        alert('Error de conexión.');
+                    } finally {
+                        submitBtn.textContent = originalText;
+                        submitBtn.disabled = false;
                     }
                 });
             }
 
-            // --- Lógica del Carrito de Compras ---
-            const cartBtn = document.getElementById('cart-btn');
-            const cartDrawer = document.getElementById('cart-drawer');
-            const cartOverlay = document.getElementById('cart-overlay');
-            const closeCart = document.getElementById('close-cart');
-            const cartItemsContainer = document.getElementById('cart-items');
-            const cartCount = document.getElementById('cart-count');
-            const totalPriceEl = document.getElementById('total-price');
 
-            let cart = JSON.parse(localStorage.getItem('glow_cart') || '[]');
-
-            function updateCartUI() {
-                cartItemsContainer.innerHTML = '';
-                let total = 0;
-
-                cart.forEach((item, index) => {
-                    total += item.price;
-                    const itemDiv = document.createElement('div');
-                    itemDiv.className = 'cart-item';
-                    itemDiv.innerHTML = `
-                        <div class="cart-item-info">
-                            <h5>${item.name}</h5>
-                            <span class="price">$${item.price}</span>
-                        </div>
-                        <button class="remove-item" onclick="removeFromCart(${index})">Eliminar</button>
-                    `;
-                    cartItemsContainer.appendChild(itemDiv);
-                });
-
-                if (cartCount) cartCount.textContent = cart.length;
-                if (totalPriceEl) totalPriceEl.textContent = `$${total}`;
-                localStorage.setItem('glow_cart', JSON.stringify(cart));
-            }
-
-            window.addToCart = (name, price) => {
-                cart.push({ name, price });
-                updateCartUI();
-                openCartDrawer();
-            };
-
-            window.removeFromCart = (index) => {
-                cart.splice(index, 1);
-                updateCartUI();
-            };
-
-            function openCartDrawer() {
-                cartDrawer.classList.add('open');
-                cartOverlay.classList.add('open');
-            }
-
-            function closeCartDrawer() {
-                cartDrawer.classList.remove('open');
-                cartOverlay.classList.remove('open');
-            }
-
-            if (cartBtn) cartBtn.addEventListener('click', openCartDrawer);
-            if (closeCart) closeCart.addEventListener('click', closeCartDrawer);
-            if (cartOverlay) cartOverlay.addEventListener('click', closeCartDrawer);
-
-            // Lógica de Compra (Finalizar Compra)
-            const checkoutBtn = document.querySelector('.checkout-btn');
-            if (checkoutBtn) {
-                checkoutBtn.addEventListener('click', async () => {
-                    if (cart.length === 0) {
-                        alert('Tu carrito está vacío.');
-                        return;
-                    }
-
-                    const total = cart.reduce((sum, item) => sum + item.price, 0);
-
-                    try {
-                        const response = await fetch('api_create_invoice.php', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ cart, total })
-                        });
-                        const result = await response.json();
-
-                        if (result.success) {
-                            showInvoice(result.invoice);
-                            cart = [];
-                            updateCartUI();
-                            closeCartDrawer();
-                        } else {
-                            alert('Error al procesar la compra: ' + result.message);
-                        }
-                    } catch (err) {
-                        console.error('Error en el checkout:', err);
-                    }
-                });
-            }
-
-            function showInvoice(invoice) {
-                document.getElementById('inv-nro').textContent = invoice.nro;
-                document.getElementById('inv-fecha').textContent = invoice.fecha;
-                document.getElementById('inv-cliente').textContent = invoice.cliente;
-                document.getElementById('inv-total').textContent = `$${invoice.total}`;
-
-                const itemsTable = document.getElementById('inv-items');
-                itemsTable.innerHTML = '';
-                invoice.items.forEach(item => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `<td>${item.name}</td><td>$${item.price}</td>`;
-                    itemsTable.appendChild(tr);
-                });
-
-                document.getElementById('invoice-modal').style.display = 'flex';
-            }
-
-            document.getElementById('close-invoice').addEventListener('click', () => {
-                document.getElementById('invoice-modal').style.display = 'none';
-            });
 
             document.getElementById('close-success-modal').addEventListener('click', () => {
                 document.getElementById('success-modal').style.display = 'none';
             });
 
-            // Añadir eventos de clic a los botones "Añadir" en los productos
-            document.querySelectorAll('.product-card').forEach(card => {
-                const btn = card.querySelector('.add-cart');
-                const name = card.querySelector('h3').textContent;
-                const price = parseInt(card.querySelector('.price').textContent.replace('$', ''));
+            // Botones de las tarjetas de producto redirigidos al Modal
+            document.querySelectorAll('.reserve-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const serviceVal = btn.getAttribute('data-service');
+                    const sel = document.querySelector('select[name="servicio"]');
+                    const display = document.getElementById('selected-service-display');
+                    
+                    if(sel && serviceVal) {
+                        sel.value = serviceVal;
+                        if (display) {
+                            const nameText = sel.options[sel.selectedIndex].text;
+                            display.textContent = `Servicio Seleccionado: ${nameText}`;
+                        }
+                    }
+                    
+                    const modal = document.getElementById('booking-modal-overlay');
+                    if (modal) modal.classList.add('open');
+                });
+            });
 
+            const closeBookingModalBtn = document.getElementById('close-booking-modal');
+            if (closeBookingModalBtn) {
+                closeBookingModalBtn.addEventListener('click', () => {
+                    document.getElementById('booking-modal-overlay').classList.remove('open');
+                });
+            }
+
+            // Enlace de 'Citas' en el navbar
+            document.querySelectorAll('.nav-cta').forEach(btn => {
                 btn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    addToCart(name, price);
+                    if (btn.getAttribute('href') === '#booking') {
+                        e.preventDefault();
+                        const modal = document.getElementById('booking-modal-overlay');
+                        if (modal) modal.classList.add('open');
+                    }
                 });
             });
 
@@ -647,7 +599,7 @@ session_start();
 
 
     <!-- Modal de Éxito de Reserva -->
-    <div id="success-modal" class="modal-notification">
+    <div id="success-modal" class="modal-notification" style="display: none;">
         <div class="modal-content">
             <div class="checkmark-wrapper">
                 <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
@@ -661,38 +613,7 @@ session_start();
         </div>
     </div>
 
-    <!-- Modal de Factura -->
-    <div id="invoice-modal" class="modal-notification" style="display: none;">
-        <div class="modal-content invoice-content">
-            <div class="invoice-header">
-                <span class="logo-text">LUXURY GLOW</span>
-                <h4>Comprobante de Compra</h4>
-            </div>
-            <div class="invoice-details">
-                <p><strong>Nro:</strong> <span id="inv-nro"></span></p>
-                <p><strong>Fecha:</strong> <span id="inv-fecha"></span></p>
-                <p><strong>Cliente:</strong> <span id="inv-cliente"></span></p>
-            </div>
-            <table class="invoice-table">
-                <thead>
-                    <tr>
-                        <th>Producto</th>
-                        <th>Precio</th>
-                    </tr>
-                </thead>
-                <tbody id="inv-items">
-                    <!-- Items de la factura -->
-                </tbody>
-            </table>
-            <div class="invoice-total">
-                Total: <span id="inv-total"></span>
-            </div>
-            <div class="invoice-footer">
-                <p>¡Muchas gracias por su compra!</p>
-                <button id="close-invoice" class="cta-button">Cerrar</button>
-            </div>
-        </div>
-    </div>
+
 
     <!-- Botón Volver Arriba -->
     <button id="scroll-top-btn" class="scroll-top-btn" aria-label="Volver arriba">
